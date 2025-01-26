@@ -75,6 +75,27 @@
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
+
+        .availability-select {
+            width: 120px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .remove-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .remove-button:hover {
+            background-color: #c0392b;
+        }
     </style>
 </head>
 <body>
@@ -89,11 +110,12 @@
                 <th>Title</th>
                 <th>Author</th>
                 <th>Availability</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody id="booksList">
             <tr>
-                <td colspan="4" class="no-data">No books in library.</td>
+                <td colspan="5" class="no-data">No books in library.</td>
             </tr>
         </tbody>
     </table>
@@ -114,7 +136,7 @@
             booksList.innerHTML = "";
 
             if (books.length === 0) {
-                booksList.innerHTML = '<tr><td colspan="4" class="no-data">No books in library.</td></tr>';
+                booksList.innerHTML = '<tr><td colspan="5" class="no-data">No books in library.</td></tr>';
                 return;
             }
 
@@ -124,10 +146,36 @@
                     <td>${book.uniqueNumber}</td>
                     <td>${book.title}</td>
                     <td>${book.author}</td>
-                    <td>${book.availability}</td>
+                    <td>
+                        <select class="availability-select" onchange="updateAvailability('${book.uniqueNumber}', this.value)">
+                            <option value="Available" ${book.availability === "Available" ? "selected" : ""}>Available</option>
+                            <option value="Not Available" ${book.availability === "Not Available" ? "selected" : ""}>Not Available</option>
+                        </select>
+                    </td>
+                    <td><button class="remove-button" onclick="removeBook('${book.uniqueNumber}')">Remove</button></td>
                 `;
                 booksList.appendChild(row);
             });
+        }
+
+        // Update availability status
+        function updateAvailability(uniqueNumber, availability) {
+            const bookIndex = books.findIndex(book => book.uniqueNumber === uniqueNumber);
+            if (bookIndex !== -1) {
+                books[bookIndex].availability = availability;
+                localStorage.setItem("books", JSON.stringify(books));
+                displayBooksInLibrary();
+            }
+        }
+
+        // Remove a book from the library
+        function removeBook(uniqueNumber) {
+            const bookIndex = books.findIndex(book => book.uniqueNumber === uniqueNumber);
+            if (bookIndex !== -1) {
+                books.splice(bookIndex, 1);  // Remove the book from the array
+                localStorage.setItem("books", JSON.stringify(books));
+                displayBooksInLibrary();  // Re-render the books list
+            }
         }
 
         // Initialize the page
