@@ -112,8 +112,8 @@
     <h2>Department of Computer Science and Application</h2>
 
     <!-- Search Bar -->
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Search by Unique Number or Title">
+    <div>
+        <input type="text" id="searchInput" placeholder="Search by Unique Number or Title" style="width: 100%; padding: 10px; margin-bottom: 20px;">
     </div>
 
     <!-- Books Table -->
@@ -169,7 +169,7 @@
             });
         }
 
-        // Handle search functionality
+        // Search books
         document.getElementById("searchInput").addEventListener("input", function () {
             const searchValue = this.value.toLowerCase();
             const filteredBooks = books.filter(book =>
