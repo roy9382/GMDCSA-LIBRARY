@@ -90,6 +90,7 @@
         <form id="addBookForm">
             <input type="text" id="uniqueNumber" placeholder="Unique Number" required>
             <input type="text" id="title" placeholder="Book Title" required>
+            <input type="text" id="author" placeholder="Author Name" required>
             <button type="submit">Add Book</button>
         </form>
     </div>
@@ -109,9 +110,10 @@
             // Get form inputs
             const uniqueNumber = document.getElementById("uniqueNumber").value.trim();
             const title = document.getElementById("title").value.trim();
+            const author = document.getElementById("author").value.trim();
 
             // Validate inputs
-            if (!uniqueNumber || !title) {
+            if (!uniqueNumber || !title || !author) {
                 alert("Please fill in all fields.");
                 return;
             }
@@ -126,6 +128,7 @@
             books.push({
                 uniqueNumber,
                 title,
+                author,
                 availability: "Available"
             });
 
