@@ -7,59 +7,31 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            background: linear-gradient(135deg, #e8f5e9, #fbe9e7);
             color: #333;
             margin: 0;
             padding: 20px;
         }
 
-        h1, h2 {
-            text-align: center;
-            color: #1e88e5;
-        }
-
         h1 {
-            font-size: 2.5rem;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-        }
-
-        .search-container {
-            max-width: 500px;
-            margin: 20px auto;
             text-align: center;
-        }
-
-        .search-container input {
-            width: 100%;
-            padding: 10px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            outline: none;
+            font-size: 2.5rem;
+            color: #2e7d32;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin: 20px 0;
         }
 
         table, th, td {
-            border: 1px solid #ccc;
+            border: 1px solid black;
         }
 
         th, td {
             padding: 10px;
             text-align: left;
-        }
-
-        th {
-            background-color: #90caf9;
-            color: #fff;
         }
 
         .nav-links {
@@ -68,118 +40,61 @@
         }
 
         .nav-links a {
-            display: inline-block;
             padding: 10px 20px;
-            margin: 10px;
             text-decoration: none;
             font-weight: bold;
             color: white;
-            background: linear-gradient(to right, #42a5f5, #64b5f6);
+            background: #4caf50;
             border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: 0.3s;
-        }
-
-        .nav-links a:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .no-data {
-            text-align: center;
-            font-style: italic;
-            color: gray;
-        }
-
-        .status {
-            padding: 5px 10px;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .available {
-            background-color: #4caf50;
-        }
-
-        .not-available {
-            background-color: #f44336;
+            margin: 5px;
         }
     </style>
 </head>
 <body>
     <h1>Books in Library</h1>
-    <h2>Department of Computer Science and Application</h2>
 
-    <!-- Search Bar -->
-    <div>
-        <input type="text" id="searchInput" placeholder="Search by Unique Number or Title" style="width: 100%; padding: 10px; margin-bottom: 20px;">
-    </div>
-
-    <!-- Books Table -->
     <table>
         <thead>
             <tr>
                 <th>Unique Number</th>
                 <th>Title</th>
-                <th>Author</th>
-                <th>Status</th>
+                <th>Availability</th>
             </tr>
         </thead>
         <tbody id="booksList">
-            <tr>
-                <td colspan="4" class="no-data">No books available.</td>
-            </tr>
+            <!-- Books will be dynamically inserted here -->
         </tbody>
     </table>
 
-    <!-- Navigation Links -->
     <div class="nav-links">
-        <a href="index.html">Back to Add Book</a>
-        <a href="borrowed.html">View Borrowed Books</a>
+        <a href="index.html">Add Book</a>
     </div>
 
     <script>
-        // Retrieve books from localStorage
+        // Load books from localStorage
         const books = JSON.parse(localStorage.getItem("books")) || [];
 
         // Display books in the library
-        function displayBooks(filteredBooks = books) {
+        function displayBooks() {
             const booksList = document.getElementById("booksList");
             booksList.innerHTML = "";
 
-            if (filteredBooks.length === 0) {
-                booksList.innerHTML = '<tr><td colspan="4" class="no-data">No books found.</td></tr>';
+            if (books.length === 0) {
+                booksList.innerHTML = `<tr><td colspan="3">No books available.</td></tr>`;
                 return;
             }
 
-            filteredBooks.forEach(book => {
+            books.forEach(book => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${book.uniqueNumber}</td>
                     <td>${book.title}</td>
-                    <td>${book.author}</td>
-                    <td>
-                        <span class="status ${book.availability === "Available" ? "available" : "not-available"}">
-                            ${book.availability}
-                        </span>
-                    </td>
+                    <td>${book.availability}</td>
                 `;
                 booksList.appendChild(row);
             });
         }
 
-        // Search books
-        document.getElementById("searchInput").addEventListener("input", function () {
-            const searchValue = this.value.toLowerCase();
-            const filteredBooks = books.filter(book =>
-                book.uniqueNumber.toLowerCase().includes(searchValue) ||
-                book.title.toLowerCase().includes(searchValue)
-            );
-            displayBooks(filteredBooks);
-        });
-
-        // Initialize the page
         displayBooks();
     </script>
 </body>
