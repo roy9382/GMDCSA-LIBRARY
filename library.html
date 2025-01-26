@@ -76,11 +76,23 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
 
-        .availability-select {
-            width: 120px;
-            padding: 5px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
+        .availability {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .available {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .not-available {
+            background-color: #e74c3c;
+            color: white;
         }
 
         .remove-button {
@@ -147,10 +159,10 @@
                     <td>${book.title}</td>
                     <td>${book.author}</td>
                     <td>
-                        <select class="availability-select" onchange="updateAvailability('${book.uniqueNumber}', this.value)">
-                            <option value="Available" ${book.availability === "Available" ? "selected" : ""}>Available</option>
-                            <option value="Not Available" ${book.availability === "Not Available" ? "selected" : ""}>Not Available</option>
-                        </select>
+                        <span class="availability ${book.availability === 'Available' ? 'available' : 'not-available'}" 
+                            onclick="toggleAvailability('${book.uniqueNumber}')">
+                            ${book.availability}
+                        </span>
                     </td>
                     <td><button class="remove-button" onclick="removeBook('${book.uniqueNumber}')">Remove</button></td>
                 `;
@@ -158,11 +170,11 @@
             });
         }
 
-        // Update availability status
-        function updateAvailability(uniqueNumber, availability) {
+        // Toggle availability between Available and Not Available
+        function toggleAvailability(uniqueNumber) {
             const bookIndex = books.findIndex(book => book.uniqueNumber === uniqueNumber);
             if (bookIndex !== -1) {
-                books[bookIndex].availability = availability;
+                books[bookIndex].availability = books[bookIndex].availability === 'Available' ? 'Not Available' : 'Available';
                 localStorage.setItem("books", JSON.stringify(books));
                 displayBooksInLibrary();
             }
