@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Borrowed Books</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #e0f7fa, #d1c4e9);
+            color: #333;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #34495e;
+            font-weight: 400;
+        }
+
+        .form-container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        input, button, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1rem;
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        button {
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(139, 195, 74, 0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .no-data {
+            text-align: center;
+            font-style: italic;
+            color: gray;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1>Student Borrowed Books</h1>
+    <h2>Department of Computer Science and Application</h2>
+
+    <!-- Form to Assign Books to Students -->
+    <div class="form-container">
+        <form id="borrowForm">
+            <select id="bookSelector" required>
+                <option value="" disabled selected>Select a Book</option>
+            </select>
+            <input type="text" id="studentName" placeholder="Student Name" required>
+            <button type="submit">Assign Book</button>
+        </form>
+    </div>
+
+    <!-- Table to Display Borrowed Books -->
+    <table>
+        <thead>
+            <tr>
+                <th>Unique Number</th>
+                <th>Title</th>
+                <th>Student Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="borrowedList">
+            <tr>
+                <td colspan="4" class="no-data">No books borrowed.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Navigation Links -->
+    <div class="nav-links">
+        <a href="index.html">Back to Add Book</a>
+        <a href="library.html">View Books in Library</a>
+    </div>
+
+    <script>
+        // Fetch books and borrowed data from localStorage
+        const books = JSON.parse(localStorage.getItem("books")) || [];
+        const borrowedBooks = JSON.parse(localStorage.getItem("borrowedBooks")) || [];
+
+        // Populate the book selector dropdown
+        function populateBookSelector() {
+            const bookSelector = document.getElementById("bookSelector");
+            bookSelector.innerHTML = '<option value="" disabled selected>Select a Book</option>';
+
+            books.forEach(book => {
+                if (!borrowedBooks.some(borrowed => borrowed.uniqueNumber === book.uniqueNumber)) {
+                    const option = document.createElement("option");
+                    option.value = book.uniqueNumber;
+                    option.textContent = `${book.uniqueNumber} - ${book.title}`;
+                    bookSelector.appendChild(option);
+                }
+            });
+        }
+
+        // Display the borrowed books
+        function displayBorrowedBooks() {
+            const borrowedList = document.getElementById("borrowedList");
+            borrowedList.innerHTML = "";
+
+            if (borrowedBooks.length === 0) {
+                borrowedList.innerHTML = '<tr><td colspan="4" class="no-data">No books borrowed.</td></tr>';
+                return;
+            }
+
+            borrowedBooks.forEach(borrowed => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${borrowed.uniqueNumber}</td>
+                    <td>${borrowed.title}</td>
+                    <td>${borrowed.studentName}</td>
+                    <td><button onclick="returnBook('${borrowed.uniqueNumber}')">Return</button></td>
+                `;
+                borrowedList.appendChild(row);
+            });
+        }
+
+        // Handle form submission to assign books
+        document.getElementById("borrowForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const bookSelector = document.getElementById("bookSelector");
+            const studentName = document.getElementById("studentName").value.trim();
+
+            const selectedBook = books.find(book => book.uniqueNumber === bookSelector.value);
+
+            if (selectedBook) {
+                borrowedBooks.push({
+                    uniqueNumber: selectedBook.uniqueNumber,
+                    title: selectedBook.title,
+                    studentName: studentName,
+                });
+
+                localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
+                alert("Book assigned successfully!");
+
+                populateBookSelector();
+                displayBorrowedBooks();
+                this.reset();
+            }
+        });
+
+        // Handle returning a book
+        function returnBook(uniqueNumber) {
+            const borrowedIndex = borrowedBooks.findIndex(borrowed => borrowed.uniqueNumber === uniqueNumber);
+
+            if (borrowedIndex > -1) {
+                const returnedBook = borrowedBooks.splice(borrowedIndex, 1)[0];
+                localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
+
+                // Mark the book as available in the main books list
+                const bookIndex = books.findIndex(book => book.uniqueNumber === returnedBook.uniqueNumber);
+                if (bookIndex > -1) {
+                    books[bookIndex].availability = "Available";
+                }
+                localStorage.setItem("books", JSON.stringify(books));
+
+                alert(`Book with Unique Number ${returnedBook.uniqueNumber} returned successfully.`);
+                populateBookSelector();
+                displayBorrowedBooks();
+            }
+        }
+
+        // Initialize the page
+        populateBookSelector();
+        displayBorrowedBooks();
+    </script>
+</body>
+</html>
