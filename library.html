@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books in Library</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #e0f7fa, #d1c4e9);
+            color: #333;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #34495e;
+            font-weight: 400;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .no-data {
+            text-align: center;
+            font-style: italic;
+            color: gray;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <h1>Books in Library</h1>
+    <h2>Department of Computer Science and Application</h2>
+
+    <!-- Table to Display Books in Library -->
+    <table>
+        <thead>
+            <tr>
+                <th>Unique Number</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Availability</th>
+            </tr>
+        </thead>
+        <tbody id="booksList">
+            <tr>
+                <td colspan="4" class="no-data">No books in library.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Navigation Links -->
+    <div class="nav-links">
+        <a href="index.html">Back to Add Book</a>
+        <a href="students.html">View Borrowed Books</a>
+    </div>
+
+    <script>
+        // Fetch books data from localStorage
+        const books = JSON.parse(localStorage.getItem("books")) || [];
+
+        // Display the books in the library
+        function displayBooksInLibrary() {
+            const booksList = document.getElementById("booksList");
+            booksList.innerHTML = "";
+
+            if (books.length === 0) {
+                booksList.innerHTML = '<tr><td colspan="4" class="no-data">No books in library.</td></tr>';
+                return;
+            }
+
+            books.forEach(book => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${book.uniqueNumber}</td>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.availability}</td>
+                `;
+                booksList.appendChild(row);
+            });
+        }
+
+        // Initialize the page
+        displayBooksInLibrary();
+    </script>
+</body>
+</html>
