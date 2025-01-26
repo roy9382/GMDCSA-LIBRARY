@@ -7,28 +7,39 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background: linear-gradient(135deg, #e0f7fa, #d1c4e9);
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
             color: #333;
+            margin: 0;
+            padding: 20px;
         }
 
         h1, h2 {
             text-align: center;
+            color: #1e88e5;
         }
 
         h1 {
             font-size: 2.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(to right, #4caf50, #8bc34a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         h2 {
             font-size: 1.5rem;
-            color: #34495e;
-            font-weight: 400;
+        }
+
+        .search-container {
+            max-width: 500px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            outline: none;
         }
 
         table {
@@ -38,7 +49,7 @@
         }
 
         table, th, td {
-            border: 1px solid black;
+            border: 1px solid #ccc;
         }
 
         th, td {
@@ -46,10 +57,9 @@
             text-align: left;
         }
 
-        .no-data {
-            text-align: center;
-            font-style: italic;
-            color: gray;
+        th {
+            background-color: #90caf9;
+            color: #fff;
         }
 
         .nav-links {
@@ -61,14 +71,13 @@
             display: inline-block;
             padding: 10px 20px;
             margin: 10px;
-            font-size: 1rem;
-            font-weight: bold;
             text-decoration: none;
+            font-weight: bold;
             color: white;
-            background: linear-gradient(to right, #4caf50, #8bc34a);
-            border-radius: 30px;
+            background: linear-gradient(to right, #42a5f5, #64b5f6);
+            border-radius: 5px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
+            transition: 0.3s;
         }
 
         .nav-links a:hover {
@@ -76,37 +85,25 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
 
-        .availability {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 15px;
-            cursor: pointer;
+        .no-data {
             text-align: center;
+            font-style: italic;
+            color: gray;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
             font-weight: bold;
         }
 
         .available {
             background-color: #4caf50;
-            color: white;
         }
 
         .not-available {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .remove-button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .remove-button:hover {
-            background-color: #c0392b;
+            background-color: #f44336;
         }
     </style>
 </head>
@@ -114,20 +111,24 @@
     <h1>Books in Library</h1>
     <h2>Department of Computer Science and Application</h2>
 
-    <!-- Table to Display Books in Library -->
+    <!-- Search Bar -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by Unique Number or Title">
+    </div>
+
+    <!-- Books Table -->
     <table>
         <thead>
             <tr>
                 <th>Unique Number</th>
                 <th>Title</th>
                 <th>Author</th>
-                <th>Availability</th>
-                <th>Action</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody id="booksList">
             <tr>
-                <td colspan="5" class="no-data">No books in library.</td>
+                <td colspan="4" class="no-data">No books available.</td>
             </tr>
         </tbody>
     </table>
@@ -135,63 +136,51 @@
     <!-- Navigation Links -->
     <div class="nav-links">
         <a href="index.html">Back to Add Book</a>
-        <a href="students.html">View Borrowed Books</a>
+        <a href="borrowed.html">View Borrowed Books</a>
     </div>
 
     <script>
-        // Fetch books data from localStorage
+        // Retrieve books from localStorage
         const books = JSON.parse(localStorage.getItem("books")) || [];
 
-        // Display the books in the library
-        function displayBooksInLibrary() {
+        // Display books in the library
+        function displayBooks(filteredBooks = books) {
             const booksList = document.getElementById("booksList");
             booksList.innerHTML = "";
 
-            if (books.length === 0) {
-                booksList.innerHTML = '<tr><td colspan="5" class="no-data">No books in library.</td></tr>';
+            if (filteredBooks.length === 0) {
+                booksList.innerHTML = '<tr><td colspan="4" class="no-data">No books found.</td></tr>';
                 return;
             }
 
-            books.forEach(book => {
+            filteredBooks.forEach(book => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${book.uniqueNumber}</td>
                     <td>${book.title}</td>
                     <td>${book.author}</td>
                     <td>
-                        <span class="availability ${book.availability === 'Available' ? 'available' : 'not-available'}" 
-                            onclick="toggleAvailability('${book.uniqueNumber}')">
+                        <span class="status ${book.availability === "Available" ? "available" : "not-available"}">
                             ${book.availability}
                         </span>
                     </td>
-                    <td><button class="remove-button" onclick="removeBook('${book.uniqueNumber}')">Remove</button></td>
                 `;
                 booksList.appendChild(row);
             });
         }
 
-        // Toggle availability between Available and Not Available
-        function toggleAvailability(uniqueNumber) {
-            const bookIndex = books.findIndex(book => book.uniqueNumber === uniqueNumber);
-            if (bookIndex !== -1) {
-                books[bookIndex].availability = books[bookIndex].availability === 'Available' ? 'Not Available' : 'Available';
-                localStorage.setItem("books", JSON.stringify(books));
-                displayBooksInLibrary();
-            }
-        }
-
-        // Remove a book from the library
-        function removeBook(uniqueNumber) {
-            const bookIndex = books.findIndex(book => book.uniqueNumber === uniqueNumber);
-            if (bookIndex !== -1) {
-                books.splice(bookIndex, 1);  // Remove the book from the array
-                localStorage.setItem("books", JSON.stringify(books));
-                displayBooksInLibrary();  // Re-render the books list
-            }
-        }
+        // Handle search functionality
+        document.getElementById("searchInput").addEventListener("input", function () {
+            const searchValue = this.value.toLowerCase();
+            const filteredBooks = books.filter(book =>
+                book.uniqueNumber.toLowerCase().includes(searchValue) ||
+                book.title.toLowerCase().includes(searchValue)
+            );
+            displayBooks(filteredBooks);
+        });
 
         // Initialize the page
-        displayBooksInLibrary();
+        displayBooks();
     </script>
 </body>
 </html>
