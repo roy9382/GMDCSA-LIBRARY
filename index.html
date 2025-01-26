@@ -5,91 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Library</title>
     <style>
-        /* Global Styles */
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #f3f4f6, #d1e8ff);
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f9fbe7, #ffecb3);
             color: #333;
+            margin: 0;
+            padding: 20px;
         }
 
         h1, h2 {
             text-align: center;
-            margin: 20px 0;
-            color: #2c3e50;
+            color: #2e7d32;
         }
 
         h1 {
             font-size: 2.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(to right, #6a11cb, #2575fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
 
         h2 {
             font-size: 1.5rem;
-            color: #34495e;
-            font-weight: 400;
         }
 
-        /* Form Container */
         .form-container {
-            max-width: 500px;
-            margin: 20px auto;
+            max-width: 400px;
+            margin: 0 auto;
             padding: 20px;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         input, button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
             font-size: 1rem;
-            border: 1px solid #dcdcdc;
-            border-radius: 10px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            border-color: #2575fc;
-            box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
         }
 
         button {
-            background: linear-gradient(to right, #6a11cb, #2575fc);
+            background: linear-gradient(to right, #4caf50, #8bc34a);
             color: #fff;
             border: none;
             cursor: pointer;
             font-weight: bold;
-            transition: all 0.3s ease;
+            transition: 0.3s;
         }
 
         button:hover {
             transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(37, 117, 252, 0.4);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.4);
         }
 
-        /* Link Styling */
-        a {
-            display: block;
+        .nav-links {
             text-align: center;
-            margin: 20px 0;
-            text-decoration: none;
-            color: #2575fc;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            margin-top: 20px;
         }
 
-        a:hover {
-            text-decoration: underline;
-            color: #6a11cb;
+        .nav-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
@@ -98,42 +87,58 @@
     <h2>Department of Computer Science and Application</h2>
 
     <div class="form-container">
-        <form id="bookForm">
+        <form id="addBookForm">
             <input type="text" id="uniqueNumber" placeholder="Unique Number" required>
-            <input type="text" id="book title" placeholder="Book Title" required>
-            <input type="text" id="author" placeholder="Author" required>
-            <input type="number" id="publication year" placeholder="Publication Year" required>
+            <input type="text" id="title" placeholder="Book Title" required>
             <button type="submit">Add Book</button>
         </form>
     </div>
 
-    <a href="library.html">View Books in Library</a>
+    <div class="nav-links">
+        <a href="library.html">View Books in Library</a>
+    </div>
 
     <script>
-        // Get books from localStorage
+        // Initialize books array from localStorage
         const books = JSON.parse(localStorage.getItem("books")) || [];
 
-        // Add book to localStorage
-        document.getElementById("bookForm").addEventListener("submit", function (e) {
-            e.preventDefault();
+        // Add a new book
+        function addBook(event) {
+            event.preventDefault(); // Prevent form submission
 
-            const uniqueNumber = document.getElementById("uniqueNumber").value;
-            const title = document.getElementById("title").value;
-            const author = document.getElementById("author").value;
-            const year = document.getElementById("year").value;
+            // Get form inputs
+            const uniqueNumber = document.getElementById("uniqueNumber").value.trim();
+            const title = document.getElementById("title").value.trim();
 
+            // Validate inputs
+            if (!uniqueNumber || !title) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            // Check for duplicate unique numbers
+            if (books.some(book => book.uniqueNumber === uniqueNumber)) {
+                alert("A book with this unique number already exists.");
+                return;
+            }
+
+            // Add the new book
             books.push({
                 uniqueNumber,
                 title,
-                author,
-                year,
-                availability: "Available",
+                availability: "Available"
             });
 
+            // Update localStorage
             localStorage.setItem("books", JSON.stringify(books));
+
+            // Reset form and notify the user
+            document.getElementById("addBookForm").reset();
             alert("Book added successfully!");
-            this.reset();
-        });
+        }
+
+        // Add event listener to the form
+        document.getElementById("addBookForm").addEventListener("submit", addBook);
     </script>
 </body>
 </html>
