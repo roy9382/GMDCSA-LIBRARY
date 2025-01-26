@@ -133,12 +133,13 @@
                 <th>Unique Number</th>
                 <th>Title</th>
                 <th>Student Name</th>
+                <th>Issue Date</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody id="borrowedList">
             <tr>
-                <td colspan="4" class="no-data">No books borrowed.</td>
+                <td colspan="5" class="no-data">No books borrowed.</td>
             </tr>
         </tbody>
     </table>
@@ -175,7 +176,7 @@
             borrowedList.innerHTML = "";
 
             if (borrowedBooks.length === 0) {
-                borrowedList.innerHTML = '<tr><td colspan="4" class="no-data">No books borrowed.</td></tr>';
+                borrowedList.innerHTML = '<tr><td colspan="5" class="no-data">No books borrowed.</td></tr>';
                 return;
             }
 
@@ -185,6 +186,7 @@
                     <td>${borrowed.uniqueNumber}</td>
                     <td>${borrowed.title}</td>
                     <td>${borrowed.studentName}</td>
+                    <td>${borrowed.issueDate}</td>
                     <td><button onclick="returnBook('${borrowed.uniqueNumber}')">Return</button></td>
                 `;
                 borrowedList.appendChild(row);
@@ -201,10 +203,13 @@
             const selectedBook = books.find(book => book.uniqueNumber === bookSelector.value);
 
             if (selectedBook) {
+                const issueDate = new Date().toLocaleDateString(); // Get current date as issue date
+
                 borrowedBooks.push({
                     uniqueNumber: selectedBook.uniqueNumber,
                     title: selectedBook.title,
                     studentName: studentName,
+                    issueDate: issueDate, // Store the issue date
                 });
 
                 localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
