@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Library</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f3f4f6, #d1e8ff);
+            color: #333;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            color: #34495e;
+            font-weight: 400;
+        }
+
+        /* Form Container */
+        .form-container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1rem;
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+        }
+
+        button {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(37, 117, 252, 0.4);
+        }
+
+        /* Link Styling */
+        a {
+            display: block;
+            text-align: center;
+            margin: 20px 0;
+            text-decoration: none;
+            color: #2575fc;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #6a11cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Digital Library</h1>
+    <h2>Department of Computer Science and Application</h2>
+
+    <div class="form-container">
+        <form id="bookForm">
+            <input type="text" id="uniqueNumber" placeholder="Unique Number" required>
+            <input type="text" id="title" placeholder="Title" required>
+            <input type="text" id="author" placeholder="Author" required>
+            <input type="number" id="year" placeholder="Year" required>
+            <button type="submit">Add Book</button>
+        </form>
+    </div>
+
+    <a href="library.html">View Books in Library</a>
+
+    <script>
+        // Get books from localStorage
+        const books = JSON.parse(localStorage.getItem("books")) || [];
+
+        // Add book to localStorage
+        document.getElementById("bookForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const uniqueNumber = document.getElementById("uniqueNumber").value;
+            const title = document.getElementById("title").value;
+            const author = document.getElementById("author").value;
+            const year = document.getElementById("year").value;
+
+            books.push({
+                uniqueNumber,
+                title,
+                author,
+                year,
+                availability: "Available",
+            });
+
+            localStorage.setItem("books", JSON.stringify(books));
+            alert("Book added successfully!");
+            this.reset();
+        });
+    </script>
+</body>
+</html>
