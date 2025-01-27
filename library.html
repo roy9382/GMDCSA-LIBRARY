@@ -26,6 +26,20 @@
             font-size: 1.5rem;
         }
 
+        .search-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .search-container input {
+            width: 50%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -111,6 +125,11 @@
     <h1>Books in Library</h1>
     <h2>Department of Computer Science and Application</h2>
 
+    <!-- Search Section -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search by Unique Number or Title" oninput="searchBooks()">
+    </div>
+
     <!-- Books Table -->
     <table>
         <thead>
@@ -132,7 +151,7 @@
     <!-- Navigation Links -->
     <div class="nav-links">
         <a href="index.html">Back to Add Book</a>
-        <a href="students.html">View Borrowed Books</a> <!-- Corrected link -->
+        <a href="students.html">View Borrowed Books</a>
     </div>
 
     <script>
@@ -140,16 +159,16 @@
         const books = JSON.parse(localStorage.getItem("books")) || [];
 
         // Display books in the library
-        function displayBooks() {
+        function displayBooks(filteredBooks = books) {
             const booksList = document.getElementById("booksList");
             booksList.innerHTML = "";
 
-            if (books.length === 0) {
+            if (filteredBooks.length === 0) {
                 booksList.innerHTML = '<tr><td colspan="5" class="no-data">No books available.</td></tr>';
                 return;
             }
 
-            books.forEach((book, index) => {
+            filteredBooks.forEach((book, index) => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${book.uniqueNumber}</td>
@@ -167,6 +186,16 @@
                 `;
                 booksList.appendChild(row);
             });
+        }
+
+        // Search books by unique number or title
+        function searchBooks() {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const filteredBooks = books.filter(book => 
+                book.uniqueNumber.toLowerCase().includes(searchInput) || 
+                book.title.toLowerCase().includes(searchInput)
+            );
+            displayBooks(filteredBooks);
         }
 
         // Toggle availability status
