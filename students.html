@@ -218,7 +218,7 @@
                     uniqueNumber: selectedBook.uniqueNumber,
                     title: selectedBook.title,
                     studentName,
-                    issueDate: new Date().toLocaleDateString("en-GB").replace(/\//g, ""), // ddmmyyyy format
+                    issueDate: new Date().toLocaleDateString("en-GB").replace(/\//g, "///"), // ddmmyyyy format
                 });
 
                 selectedBook.availability = "Not Available";
