@@ -86,22 +86,15 @@
             color: gray;
         }
 
-        .return-date input[type="date"] {
+        .return-date-input {
+            width: 90%;
             padding: 8px;
-            width: 95%;
-            border: 2px solid #4caf50;
+            border: 2px solid #8bc34a;
             border-radius: 5px;
-            background: #f1f8e9;
-            color: #388e3c;
-            font-weight: bold;
             font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .return-date input[type="date"]:focus {
-            border-color: #8bc34a;
-            background: #e8f5e9;
-            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+            background: #f1f8e9;
+            color: #4caf50;
+            text-align: center;
         }
 
         .nav-links {
@@ -169,26 +162,15 @@
     </div>
 
     <script>
-        // Fetch books and borrowed data from localStorage
         const books = JSON.parse(localStorage.getItem("books")) || [];
         const borrowedBooks = JSON.parse(localStorage.getItem("borrowedBooks")) || [];
 
-        // Function to format date as DDMMYYYY
-        function formatDate(date) {
-            const d = new Date(date);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const year = d.getFullYear();
-            return `${day}${month}${year}`;
-        }
-
-        // Populate the book selector dropdown
+        // Populate book selector
         function populateBookSelector() {
             const bookSelector = document.getElementById("bookSelector");
             bookSelector.innerHTML = '<option value="" disabled selected>Select a Book</option>';
-
             books.forEach(book => {
-                if (!borrowedBooks.some(borrowed => borrowed.uniqueNumber === book.uniqueNumber)) {
+                if (!borrowedBooks.some(borrowed => borrowed.uniqueNumber === book.uniqueNumber) && book.availability === "Available") {
                     const option = document.createElement("option");
                     option.value = book.uniqueNumber;
                     option.textContent = `${book.uniqueNumber} - ${book.title}`;
@@ -197,7 +179,7 @@
             });
         }
 
-        // Display the borrowed books
+        // Display borrowed books
         function displayBorrowedBooks() {
             const borrowedList = document.getElementById("borrowedList");
             borrowedList.innerHTML = "";
@@ -213,14 +195,16 @@
                     <td>${borrowed.uniqueNumber}</td>
                     <td>${borrowed.title}</td>
                     <td>${borrowed.studentName}</td>
-                    <td>${formatDate(borrowed.issueDate)}</td>
-                    <td class="return-date"><input type="date" onchange="setReturnDate('${borrowed.uniqueNumber}', this.value)"></td>
+                    <td>${borrowed.issueDate}</td>
+                    <td>
+                        <input type="date" class="return-date-input" onchange="setReturnDate('${borrowed.uniqueNumber}', this.value)">
+                    </td>
                 `;
                 borrowedList.appendChild(row);
             });
         }
 
-        // Handle form submission to assign books
+        // Handle form submission
         document.getElementById("borrowForm").addEventListener("submit", function (e) {
             e.preventDefault();
 
@@ -233,11 +217,14 @@
                 borrowedBooks.push({
                     uniqueNumber: selectedBook.uniqueNumber,
                     title: selectedBook.title,
-                    studentName: studentName,
-                    issueDate: new Date().toISOString(), // Current date
+                    studentName,
+                    issueDate: new Date().toLocaleDateString("en-GB").replace(/\//g, ""), // ddmmyyyy format
                 });
 
+                selectedBook.availability = "Not Available";
+
                 localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
+                localStorage.setItem("books", JSON.stringify(books));
                 alert("Book assigned successfully!");
 
                 populateBookSelector();
@@ -246,17 +233,25 @@
             }
         });
 
-        // Set the return date
+        // Set the return date and mark the book as available
         function setReturnDate(uniqueNumber, returnDate) {
             const borrowedIndex = borrowedBooks.findIndex(borrowed => borrowed.uniqueNumber === uniqueNumber);
             if (borrowedIndex > -1) {
-                borrowedBooks[borrowedIndex].returnDate = returnDate;
+                borrowedBooks.splice(borrowedIndex, 1);
+
+                const bookIndex = books.findIndex(book => book.uniqueNumber === uniqueNumber);
+                if (bookIndex > -1) books[bookIndex].availability = "Available";
+
                 localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
-                alert(`Return date set for book: ${uniqueNumber}`);
+                localStorage.setItem("books", JSON.stringify(books));
+
+                alert(`Book returned on ${returnDate}`);
+                populateBookSelector();
+                displayBorrowedBooks();
             }
         }
 
-        // Initialize the page
+        // Initialize
         populateBookSelector();
         displayBorrowedBooks();
     </script>
