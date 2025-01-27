@@ -86,6 +86,24 @@
             color: gray;
         }
 
+        .return-date input[type="date"] {
+            padding: 8px;
+            width: 95%;
+            border: 2px solid #4caf50;
+            border-radius: 5px;
+            background: #f1f8e9;
+            color: #388e3c;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .return-date input[type="date"]:focus {
+            border-color: #8bc34a;
+            background: #e8f5e9;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
         .nav-links {
             text-align: center;
             margin-top: 20px;
@@ -155,6 +173,15 @@
         const books = JSON.parse(localStorage.getItem("books")) || [];
         const borrowedBooks = JSON.parse(localStorage.getItem("borrowedBooks")) || [];
 
+        // Function to format date as DDMMYYYY
+        function formatDate(date) {
+            const d = new Date(date);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}${month}${year}`;
+        }
+
         // Populate the book selector dropdown
         function populateBookSelector() {
             const bookSelector = document.getElementById("bookSelector");
@@ -186,8 +213,8 @@
                     <td>${borrowed.uniqueNumber}</td>
                     <td>${borrowed.title}</td>
                     <td>${borrowed.studentName}</td>
-                    <td>${borrowed.issueDate}</td>
-                    <td><input type="date" onchange="setReturnDate('${borrowed.uniqueNumber}', this.value)"></td>
+                    <td>${formatDate(borrowed.issueDate)}</td>
+                    <td class="return-date"><input type="date" onchange="setReturnDate('${borrowed.uniqueNumber}', this.value)"></td>
                 `;
                 borrowedList.appendChild(row);
             });
@@ -207,7 +234,7 @@
                     uniqueNumber: selectedBook.uniqueNumber,
                     title: selectedBook.title,
                     studentName: studentName,
-                    issueDate: new Date().toISOString().split("T")[0], // Today's date
+                    issueDate: new Date().toISOString(), // Current date
                 });
 
                 localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
