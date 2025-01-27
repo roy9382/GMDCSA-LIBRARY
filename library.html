@@ -72,6 +72,7 @@
             border-radius: 5px;
             color: white;
             font-weight: bold;
+            cursor: pointer;
         }
 
         .available {
@@ -155,7 +156,8 @@
                     <td>${book.title}</td>
                     <td>${book.author}</td>
                     <td>
-                        <span class="status ${book.availability === "Available" ? "available" : "not-available"}">
+                        <span class="status ${book.availability === "Available" ? "available" : "not-available"}" 
+                              onclick="toggleAvailability(${index})">
                             ${book.availability}
                         </span>
                     </td>
@@ -165,6 +167,13 @@
                 `;
                 booksList.appendChild(row);
             });
+        }
+
+        // Toggle availability status
+        function toggleAvailability(index) {
+            books[index].availability = books[index].availability === "Available" ? "Not Available" : "Available";
+            localStorage.setItem("books", JSON.stringify(books));
+            displayBooks();
         }
 
         // Remove a book from the library
