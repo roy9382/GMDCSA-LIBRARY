@@ -134,7 +134,7 @@
                 <th>Title</th>
                 <th>Student Name</th>
                 <th>Issue Date</th>
-                <th>Action</th>
+                <th>Return Date</th>
             </tr>
         </thead>
         <tbody id="borrowedList">
@@ -187,7 +187,7 @@
                     <td>${borrowed.title}</td>
                     <td>${borrowed.studentName}</td>
                     <td>${borrowed.issueDate}</td>
-                    <td><button onclick="returnBook('${borrowed.uniqueNumber}')">Return</button></td>
+                    <td><input type="date" onchange="setReturnDate('${borrowed.uniqueNumber}', this.value)"></td>
                 `;
                 borrowedList.appendChild(row);
             });
@@ -203,13 +203,11 @@
             const selectedBook = books.find(book => book.uniqueNumber === bookSelector.value);
 
             if (selectedBook) {
-                const issueDate = new Date().toLocaleDateString(); // Get current date as issue date
-
                 borrowedBooks.push({
                     uniqueNumber: selectedBook.uniqueNumber,
                     title: selectedBook.title,
                     studentName: studentName,
-                    issueDate: issueDate, // Store the issue date
+                    issueDate: new Date().toISOString().split("T")[0], // Today's date
                 });
 
                 localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
@@ -221,24 +219,13 @@
             }
         });
 
-        // Handle returning a book
-        function returnBook(uniqueNumber) {
+        // Set the return date
+        function setReturnDate(uniqueNumber, returnDate) {
             const borrowedIndex = borrowedBooks.findIndex(borrowed => borrowed.uniqueNumber === uniqueNumber);
-
             if (borrowedIndex > -1) {
-                const returnedBook = borrowedBooks.splice(borrowedIndex, 1)[0];
+                borrowedBooks[borrowedIndex].returnDate = returnDate;
                 localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
-
-                // Mark the book as available in the main books list
-                const bookIndex = books.findIndex(book => book.uniqueNumber === returnedBook.uniqueNumber);
-                if (bookIndex > -1) {
-                    books[bookIndex].availability = "Available";
-                }
-                localStorage.setItem("books", JSON.stringify(books));
-
-                alert(`Book with Unique Number ${returnedBook.uniqueNumber} returned successfully.`);
-                populateBookSelector();
-                displayBorrowedBooks();
+                alert(`Return date set for book: ${uniqueNumber}`);
             }
         }
 
