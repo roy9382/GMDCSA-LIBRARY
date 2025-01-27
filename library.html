@@ -7,31 +7,79 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #e8f5e9, #fbe9e7);
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
             color: #333;
             margin: 0;
             padding: 20px;
         }
 
-        h1 {
+        h1, h2 {
             text-align: center;
+            color: #1e88e5;
+        }
+
+        h1 {
             font-size: 2.5rem;
-            color: #2e7d32;
+        }
+
+        h2 {
+            font-size: 1.5rem;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin-top: 20px;
         }
 
         table, th, td {
-            border: 1px solid black;
+            border: 1px solid #ccc;
         }
 
         th, td {
             padding: 10px;
             text-align: left;
+        }
+
+        th {
+            background-color: #90caf9;
+            color: #fff;
+        }
+
+        .no-data {
+            text-align: center;
+            font-style: italic;
+            color: gray;
+        }
+
+        button {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            color: white;
+            background: #f44336;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background: #d32f2f;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .available {
+            background-color: #4caf50;
+        }
+
+        .not-available {
+            background-color: #f44336;
         }
 
         .nav-links {
@@ -40,38 +88,54 @@
         }
 
         .nav-links a {
+            display: inline-block;
             padding: 10px 20px;
+            margin: 10px;
             text-decoration: none;
             font-weight: bold;
             color: white;
-            background: #4caf50;
+            background: linear-gradient(to right, #42a5f5, #64b5f6);
             border-radius: 5px;
-            margin: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
 <body>
     <h1>Books in Library</h1>
+    <h2>Department of Computer Science and Application</h2>
 
+    <!-- Books Table -->
     <table>
         <thead>
             <tr>
                 <th>Unique Number</th>
                 <th>Title</th>
-                <th>Availability</th>
+                <th>Author</th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody id="booksList">
-            <!-- Books will be dynamically inserted here -->
+            <tr>
+                <td colspan="5" class="no-data">No books available.</td>
+            </tr>
         </tbody>
     </table>
 
+    <!-- Navigation Links -->
     <div class="nav-links">
-        <a href="index.html">Add Book</a>
+        <a href="index.html">Back to Add Book</a>
+        <a href="borrowed.html">View Borrowed Books</a>
     </div>
 
     <script>
-        // Load books from localStorage
+        // Retrieve books from localStorage
         const books = JSON.parse(localStorage.getItem("books")) || [];
 
         // Display books in the library
@@ -80,21 +144,39 @@
             booksList.innerHTML = "";
 
             if (books.length === 0) {
-                booksList.innerHTML = `<tr><td colspan="3">No books available.</td></tr>`;
+                booksList.innerHTML = '<tr><td colspan="5" class="no-data">No books available.</td></tr>';
                 return;
             }
 
-            books.forEach(book => {
+            books.forEach((book, index) => {
                 const row = document.createElement("tr");
                 row.innerHTML = `
                     <td>${book.uniqueNumber}</td>
                     <td>${book.title}</td>
-                    <td>${book.availability}</td>
+                    <td>${book.author}</td>
+                    <td>
+                        <span class="status ${book.availability === "Available" ? "available" : "not-available"}">
+                            ${book.availability}
+                        </span>
+                    </td>
+                    <td>
+                        <button onclick="removeBook(${index})">Remove</button>
+                    </td>
                 `;
                 booksList.appendChild(row);
             });
         }
 
+        // Remove a book from the library
+        function removeBook(index) {
+            if (confirm("Are you sure you want to remove this book?")) {
+                books.splice(index, 1);
+                localStorage.setItem("books", JSON.stringify(books));
+                displayBooks();
+            }
+        }
+
+        // Initialize the page
         displayBooks();
     </script>
 </body>
