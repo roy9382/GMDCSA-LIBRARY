@@ -5,86 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Borrowed Books</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: linear-gradient(135deg, #e0f7fa, #d1c4e9);
-            color: #333;
-        }
-
-        h1, h2 {
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: linear-gradient(to right, #4caf50, #8bc34a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            color: #34495e;
-            font-weight: 400;
-        }
-
-        .form-container {
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        input, button, select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            font-size: 1rem;
-            border: 1px solid #dcdcdc;
-            border-radius: 10px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        button {
-            background: linear-gradient(to right, #4caf50, #8bc34a);
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(139, 195, 74, 0.4);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table, th, td {
-            border: 1px solid black;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        .no-data {
-            text-align: center;
-            font-style: italic;
-            color: gray;
-        }
+        /* ...existing styles... */
 
         .return-date-input {
             width: 90%;
@@ -97,28 +18,9 @@
             text-align: center;
         }
 
-        .nav-links {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .nav-links a {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 10px;
-            font-size: 1rem;
+        .status-returned {
+            color: #d32f2f;
             font-weight: bold;
-            text-decoration: none;
-            color: white;
-            background: linear-gradient(to right, #4caf50, #8bc34a);
-            border-radius: 30px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
@@ -146,11 +48,12 @@
                 <th>Student Name</th>
                 <th>Issue Date</th>
                 <th>Return Date</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody id="borrowedList">
             <tr>
-                <td colspan="5" class="no-data">No books borrowed.</td>
+                <td colspan="6" class="no-data">No books borrowed.</td>
             </tr>
         </tbody>
     </table>
@@ -170,7 +73,7 @@
             const bookSelector = document.getElementById("bookSelector");
             bookSelector.innerHTML = '<option value="" disabled selected>Select a Book</option>';
             books.forEach(book => {
-                if (!borrowedBooks.some(borrowed => borrowed.uniqueNumber === book.uniqueNumber) && book.availability === "Available") {
+                if (!borrowedBooks.some(borrowed => borrowed.uniqueNumber === book.uniqueNumber && !borrowed.returnDate) && book.availability === "Available") {
                     const option = document.createElement("option");
                     option.value = book.uniqueNumber;
                     option.textContent = `${book.uniqueNumber} - ${book.title}`;
@@ -185,7 +88,7 @@
             borrowedList.innerHTML = "";
 
             if (borrowedBooks.length === 0) {
-                borrowedList.innerHTML = '<tr><td colspan="5" class="no-data">No books borrowed.</td></tr>';
+                borrowedList.innerHTML = '<tr><td colspan="6" class="no-data">No books borrowed.</td></tr>';
                 return;
             }
 
@@ -197,7 +100,10 @@
                     <td>${borrowed.studentName}</td>
                     <td>${borrowed.issueDate}</td>
                     <td>
-                        <input type="date" class="return-date-input" onchange="setReturnDate('${borrowed.uniqueNumber}', this.value)">
+                        ${borrowed.returnDate || `<input type="date" class="return-date-input" onchange="setReturnDate('${borrowed.uniqueNumber}', this.value)">`}
+                    </td>
+                    <td>
+                        ${borrowed.returnDate ? '<span class="status-returned">Returned</span>' : 'Borrowed'}
                     </td>
                 `;
                 borrowedList.appendChild(row);
@@ -219,6 +125,7 @@
                     title: selectedBook.title,
                     studentName,
                     issueDate: new Date().toLocaleDateString("en-GB").replace(/\//g, ""), // ddmmyyyy format
+                    returnDate: null,
                 });
 
                 selectedBook.availability = "Not Available";
@@ -237,10 +144,13 @@
         function setReturnDate(uniqueNumber, returnDate) {
             const borrowedIndex = borrowedBooks.findIndex(borrowed => borrowed.uniqueNumber === uniqueNumber);
             if (borrowedIndex > -1) {
-                borrowedBooks.splice(borrowedIndex, 1);
+                borrowedBooks[borrowedIndex].returnDate = returnDate;
 
+                // Mark the book as available in the books list
                 const bookIndex = books.findIndex(book => book.uniqueNumber === uniqueNumber);
-                if (bookIndex > -1) books[bookIndex].availability = "Available";
+                if (bookIndex > -1) {
+                    books[bookIndex].availability = "Available";
+                }
 
                 localStorage.setItem("borrowedBooks", JSON.stringify(borrowedBooks));
                 localStorage.setItem("books", JSON.stringify(books));
